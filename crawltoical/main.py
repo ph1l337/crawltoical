@@ -1,4 +1,5 @@
 import requests
+import time
 from lxml import html
 from ics import Calendar, Event
 
@@ -25,5 +26,8 @@ def parse_calendar():
 
 
 if __name__ == '__main__':
-    parse_calendar()
+    while True:
+        parse_calendar()
+        time.sleep(3600)
+
 
