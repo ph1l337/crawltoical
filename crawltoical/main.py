@@ -1,33 +1,40 @@
 import requests
 import time
+from icalendar import Calendar, Event, vText
 from lxml import html
-from ics import Calendar, Event
+from dateutil.parser import parse
+from dateutil.tz import gettz
 
 
 def parse_calendar():
+    cal = Calendar()
+    cal.add('prodid', 'Brought to you by ph1l337')
+    cal.add('version', '2.0')
 
-    calendar = Calendar()
-    res = requests.get('https://www.kth.se/en/ece/avdelningen-for-larande/sprak-och-kommunikation/for-studenter/for-master-och-utbytesstudenter/introduktionskurs')
+    res = requests.get(
+        'https://www.kth.se/en/ece/avdelningen-for-larande/sprak-och-kommunikation/for-studenter/for-master-och-utbytesstudenter/introduktionskurs')
     tree = html.fromstring(res.content)
     rows = tree.xpath('//table/tr')
 
     for row in rows[1:]:
         columns = row.xpath('td/text()')
-        e = Event()
-        e.name = "Swedish Class"
-        e.begin = ('{} {}'.format(columns[2], columns[3]), 'YYYY-MM-DD HH:mm')
-        e.end = ('{} {}'.format(columns[2], columns[4]), 'YYYY-MM-DD HH:mm')
-        e.location = columns[5]
+        event = Event()
+        event.add('summary', 'Swedish Class')
 
-        calendar.events.append(e)
+        tzinfos = {"CEST": gettz("Europe/Stockholm")}
+        start = parse('{} {}:00 CEST'.format(columns[2], columns[3]), tzinfos=tzinfos)
+        end = parse('{} {}:00 CEST'.format(columns[2], columns[4]), tzinfos=tzinfos)
+        event.add('dtstart', start)
+        event.add('dtend', end)
+        event['location'] = vText(columns[5])
 
-    with open('out/swedish_course.ics', 'w') as f:
-        f.writelines(calendar)
+        cal.add_component(event)
+
+    with open('out/swedish_course.ics', 'wb') as f:
+        f.write(cal.to_ical())
 
 
 if __name__ == '__main__':
     while True:
         parse_calendar()
         time.sleep(3600)
-
-
