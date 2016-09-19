@@ -4,6 +4,7 @@ import pytz
 from icalendar import Calendar, Event, vText
 from lxml import html
 from dateutil.parser import parse
+from datetime import timedelta
 from dateutil.tz import gettz
 
 
@@ -23,15 +24,15 @@ def parse_calendar():
         event.add('summary', 'Swedish Class')
 
         tzinfos = {"CEST": pytz.timezone("Europe/Stockholm")}
-        start = parse('{} {}:00 CEST'.format(columns[2], columns[3]), tzinfos=tzinfos)
-        end = parse('{} {}:00 CEST'.format(columns[2], columns[4]), tzinfos=tzinfos)
+        start = parse('{} {}:00 CEST'.format(columns[2], columns[3]), tzinfos=tzinfos) - timedelta(hours=2)
+        end = parse('{} {}:00 CEST'.format(columns[2], columns[4]), tzinfos=tzinfos) - timedelta(hours=2)
         event.add('dtstart', start)
         event.add('dtend', end)
         event['location'] = vText(columns[5])
 
         cal.add_component(event)
 
-    with open('out/swedish_course.ics', 'wb') as f:
+    with open('out/temp.ics', 'wb') as f:
         f.write(cal.to_ical())
 
 
