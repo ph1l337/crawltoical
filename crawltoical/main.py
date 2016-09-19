@@ -32,7 +32,7 @@ def parse_calendar():
 
         cal.add_component(event)
 
-    with open('out/temp.ics', 'wb') as f:
+    with open('out/swedish_course.ics', 'wb') as f:
         f.write(cal.to_ical())
 
 
