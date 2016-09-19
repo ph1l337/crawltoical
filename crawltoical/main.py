@@ -1,5 +1,6 @@
 import requests
 import time
+import pytz
 from icalendar import Calendar, Event, vText
 from lxml import html
 from dateutil.parser import parse
@@ -21,7 +22,7 @@ def parse_calendar():
         event = Event()
         event.add('summary', 'Swedish Class')
 
-        tzinfos = {"CEST": gettz("Europe/Stockholm")}
+        tzinfos = {"CEST": pytz.timezone("Europe/Stockholm")}
         start = parse('{} {}:00 CEST'.format(columns[2], columns[3]), tzinfos=tzinfos)
         end = parse('{} {}:00 CEST'.format(columns[2], columns[4]), tzinfos=tzinfos)
         event.add('dtstart', start)
